@@ -18,38 +18,40 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Validate teamname input
-      shell: bash
-      run: |
-        if [[ ! "${{ inputs.team-short-name }}" =~ ^[a-zA-Z]{1,5}$ ]]; then
-          echo "Error: 'team-short-name' must be 1-5 letters with no numbers."
-          exit 1
-        fi
+    # - name: Validate teamname input
+    #   shell: bash
+    #   run: |
+    #     if [[ ! "${{ inputs.team-short-name }}" =~ ^[a-zA-Z]{1,5}$ ]]; then
+    #       echo "Error: 'team-short-name' must be 1-5 letters with no numbers."
+    #       exit 1
+    #     fi
     - name: Create deployment
       id: create_deployment
       shell: bash
       env:
-        GH_TOKEN: ${{ inputs.GITHUB_TOKEN }}
-      run: |
-        RESPONSE=$(gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{ inputs.repository }}/deployments \
-          -f "ref=${{ inputs.ref }}" -f "environment=kpi-deployment-count" -f "description=team:${{ inputs.team-short-name }}")
-        DEPLOYMENT_ID=$(echo $RESPONSE | jq '.id')
-        echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
-    - name: Update deployment status
-      shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.GITHUB_TOKEN }}
-      run: |
-        gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{ inputs.repository }}/deployments/$DEPLOYMENT_ID/statuses \
-          -f "environment=kpi-deployment-count" -f "state=success" -f "description=team:${{ inputs.team-short-name }}"
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+      run:
+        gh repo list
+      # run: |
+      #   RESPONSE=$(gh api \
+      #     --method POST \
+      #     -H "Accept: application/vnd.github+json" \
+      #     -H "X-GitHub-Api-Version: 2022-11-28" \
+      #     /repos/${{ inputs.repository }}/deployments \
+      #     -f "ref=${{ inputs.ref }}" -f "environment=kpi-deployment-count" -f "description=team:${{ inputs.team-short-name }}")
+      #   DEPLOYMENT_ID=$(echo $RESPONSE | jq '.id')
+      #   echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+    # - name: Update deployment status
+    #   shell: bash
+    #   env:
+    #     GH_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+    #   run: |
+    #     gh api \
+    #       --method POST \
+    #       -H "Accept: application/vnd.github+json" \
+    #       -H "X-GitHub-Api-Version: 2022-11-28" \
+    #       /repos/${{ inputs.repository }}/deployments/$DEPLOYMENT_ID/statuses \
+    #       -f "environment=kpi-deployment-count" -f "state=success" -f "description=team:${{ inputs.team-short-name }}"
 
 
 # # .github/workflows/deployment-workflow.yaml
